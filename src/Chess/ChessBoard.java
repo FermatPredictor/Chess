@@ -1,20 +1,51 @@
 package Chess;
 
-import processing.core.PApplet;
+import java.util.ArrayList;
+import java.util.Random;
 
-public class ChessBoard extends PApplet{
+import processing.core.PApplet;
+import processing.core.PImage;
+
+public class ChessBoard extends PApplet {
 	
 	private static final long serialVersionUID = 1L;
 	private final static int width = 1000, height = 500;
-	private int size;
+	private int chessX=100, chessY=50, chessBoardWidth=550;
+	public PImage white, black, whiteCurrent, blackCurrent;
+	private int size=9;
+	private ArrayList<Stone> stones;
 	
 	public void setup() {
 		size(width, height);
+		this.white=loadImage("white.PNG");
+		this.black=loadImage("black.PNG");
+		this.whiteCurrent=loadImage("white_current.png");
+		this.blackCurrent=loadImage("black_current.png");
+
 	}
 	
 	public void draw() 
 	{
-		background(255);
+		background(52,203,41);
+		fill(168,134,87);
+        stroke(200);
+		rect(chessX,chessY,chessBoardWidth,chessBoardWidth);
+		stroke(0);
+		for(int i=0; i<size ; i++){
+			line(chessX+i*chessBoardWidth/(size-1),chessY,chessX+i*chessBoardWidth/(size-1),chessY+chessBoardWidth);
+		}
+		for(int i=0; i<size ; i++){
+			line(chessX,chessY+i*chessBoardWidth/(size-1),chessX+chessBoardWidth,chessY+i*chessBoardWidth/(size-1));
+		}
+		
 	}
+	
+	@Override
+    public void mouseClicked(){
+	   //System.out.println(123);
+   }
+
+	
+	
 
 }
