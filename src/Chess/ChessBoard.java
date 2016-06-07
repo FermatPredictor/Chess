@@ -21,7 +21,7 @@ public class ChessBoard extends PApplet {
 		this.black=loadImage("black.PNG");
 		this.whiteCurrent=loadImage("white_current.png");
 		this.blackCurrent=loadImage("black_current.png");
-
+		stones=new ArrayList<Stone>();
 	}
 	
 	public void draw() 
@@ -38,11 +38,21 @@ public class ChessBoard extends PApplet {
 			line(chessX,chessY+i*chessBoardWidth/(size-1),chessX+chessBoardWidth,chessY+i*chessBoardWidth/(size-1));
 		}
 		
+		if(!stones.isEmpty()){
+			for(Stone stone: stones){
+				if(stone.color.equals("black"))
+					image(black,stone.x, stone.y);
+				else if(stone.color.equals("white"))
+					image(white,stone.x, stone.y);
+				}
+		}
+		
 	}
 	
 	@Override
     public void mouseClicked(){
-	   //System.out.println(123);
+		
+		stones.add(new Stone(1,"black",this,this));
    }
 
 	

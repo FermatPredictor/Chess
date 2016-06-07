@@ -4,7 +4,7 @@ import processing.core.PApplet;
 
 public class Stone {
 	
-	int step;
+	public int step;
 	String color;
 	boolean isDead=false;
 	int x,y;
