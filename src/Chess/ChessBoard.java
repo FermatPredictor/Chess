@@ -14,6 +14,7 @@ public class ChessBoard extends PApplet {
 	public PImage white, black, whiteCurrent, blackCurrent;
 	private int size=9;
 	private float unit=(float)chessBoardWidth/(size-1);
+	private int nowStep=1;
 	private ArrayList<Stone> stones;
 	
 	public void setup() {
@@ -38,9 +39,18 @@ public class ChessBoard extends PApplet {
 			line(chessX,chessY+i*unit,chessX+chessBoardWidth,chessY+i*unit);
 		}
 		
-		fill(0);
-		if(getCoordinate()[0]>0 && getCoordinate()[1]>0)
-		ellipse(chessX+(getCoordinate()[0]-1)*unit, chessY+(getCoordinate()[1]-1)*unit,50,50);
+		
+		if(getCoordinate()[0]>0 && getCoordinate()[1]>0){
+			if(nowStep%2==1){
+				fill(0);
+				ellipse(chessX+(getCoordinate()[0]-1)*unit, chessY+(getCoordinate()[1]-1)*unit,50,50);
+			}
+			else if(nowStep%2==0){
+				fill(255);
+				ellipse(chessX+(getCoordinate()[0]-1)*unit, chessY+(getCoordinate()[1]-1)*unit,50,50);
+			}
+		}
+		
 		
 		if(!stones.isEmpty()){
 			for(Stone stone: stones){
@@ -72,8 +82,14 @@ public class ChessBoard extends PApplet {
 	
 	@Override
     public void mouseClicked(){
-		if(getCoordinate()[0]>0 && getCoordinate()[1]>0)
-		stones.add(new Stone(getCoordinate(),1,"black",this,this));
+		if(getCoordinate()[0]>0 && getCoordinate()[1]>0){
+			if(nowStep%2==1)
+				stones.add(new Stone(getCoordinate(),nowStep,"black",this,this));
+			else if(nowStep%2==0)
+				stones.add(new Stone(getCoordinate(),nowStep,"white",this,this));
+			nowStep++;
+		}
+		
    }
 
 
