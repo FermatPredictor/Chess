@@ -66,7 +66,7 @@ public class ChessBoard extends PApplet {
 				point[1]=j;
 			}
 		}
-		System.out.println(point[0]+" "+point[1]);
+		//System.out.println(point[0]+" "+point[1]);
 		return point;
 	}
 	
