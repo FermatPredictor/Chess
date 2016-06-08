@@ -13,6 +13,7 @@ public class ChessBoard extends PApplet {
 	private int chessX=100, chessY=50, chessBoardWidth=550;
 	public PImage white, black, whiteCurrent, blackCurrent;
 	private int size=9;
+	private float unit=(float)chessBoardWidth/(size-1);
 	private ArrayList<Stone> stones;
 	
 	public void setup() {
@@ -28,34 +29,52 @@ public class ChessBoard extends PApplet {
 	{
 		background(52,203,41);
 		fill(168,134,87);
-        stroke(200);
-		rect(chessX,chessY,chessBoardWidth,chessBoardWidth);
+		rect(chessX-20,chessY-20,chessBoardWidth+40,chessBoardWidth+40);
 		stroke(0);
 		for(int i=0; i<size ; i++){
-			line(chessX+i*chessBoardWidth/(size-1),chessY,chessX+i*chessBoardWidth/(size-1),chessY+chessBoardWidth);
+			line(chessX+i*unit,chessY,chessX+i*unit,chessY+chessBoardWidth);
 		}
 		for(int i=0; i<size ; i++){
-			line(chessX,chessY+i*chessBoardWidth/(size-1),chessX+chessBoardWidth,chessY+i*chessBoardWidth/(size-1));
+			line(chessX,chessY+i*unit,chessX+chessBoardWidth,chessY+i*unit);
 		}
+		
+		fill(0);
+		if(getCoordinate()[0]>0 && getCoordinate()[1]>0)
+		ellipse(chessX+(getCoordinate()[0]-1)*unit, chessY+(getCoordinate()[1]-1)*unit,50,50);
 		
 		if(!stones.isEmpty()){
 			for(Stone stone: stones){
 				if(stone.color.equals("black"))
-					image(black,stone.x, stone.y);
+					image(black,chessX+(stone.x-1)*unit-unit/2, chessY+(stone.y-1)*unit-unit/2);
 				else if(stone.color.equals("white"))
-					image(white,stone.x, stone.y);
+					image(white,chessX+(stone.x-1)*unit-unit/2, chessY+(stone.y-1)*unit-unit/2);
 				}
 		}
 		
 	}
 	
+	public int[] getCoordinate(){
+		int point[]=new int[2];
+		float unit=(float)chessBoardWidth/(size-1);
+		for(int i=1; i<=size;i ++){
+			if(mouseX>=chessX+(i-1)*unit-unit/2 && mouseX<chessX+(i-1)*unit+unit/2){
+				point[0]=i;
+			}
+		}
+		for(int j=1; j<=size;j ++){
+			if(mouseY>=chessY+(j-1)*unit-unit/2 && mouseY<chessY+(j-1)*unit+unit/2){
+				point[1]=j;
+			}
+		}
+		System.out.println(point[0]+" "+point[1]);
+		return point;
+	}
+	
 	@Override
     public void mouseClicked(){
-		
-		stones.add(new Stone(1,"black",this,this));
+		if(getCoordinate()[0]>0 && getCoordinate()[1]>0)
+		stones.add(new Stone(getCoordinate(),1,"black",this,this));
    }
 
-	
-	
 
 }
