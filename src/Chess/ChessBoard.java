@@ -19,6 +19,7 @@ public class ChessBoard extends PApplet {
 	private char[][] points=new char[size+1][size+1]; //b:black; w:white; n:null
 	private char[][] judgeBoard=new char[size+1][size+1];
 	private boolean judgeing;
+	private boolean canPlaceChess=true;
 	
 	public void setup() {
 		size(width, height);
@@ -33,7 +34,11 @@ public class ChessBoard extends PApplet {
 	}
 	
 	public void draw() 
-	{
+	{  
+		if(mousePressed && canPlaceChess){
+			placeChess();
+			canPlaceChess=false;
+		}
 		background(52,203,41);
 		fill(168,134,87);
 		rect(chessX-20,chessY-20,chessBoardWidth+40,chessBoardWidth+40);
@@ -110,54 +115,92 @@ public class ChessBoard extends PApplet {
 			 }
 		 }
 	 }
+	 
+	 
+	 //when some chess be eaten, removed it
+	 public void cleaning(int boardSize, int now_x, int now_y, char c){
+		 
+		 for(Stone stone: stones){
+			 if(!stone.isDead && stone.x==now_x && stone.y==now_y)
+				 stone.isDead=true;
+		 }
+		 points[now_x][now_y]='n';
+		 if(now_x+1<=boardSize){
+			 if(points[now_x+1][now_y]==c)cleaning(boardSize,now_x+1,now_y,c);
+		 }
+		 if(now_x-1>0){
+			 if(points[now_x-1][now_y]==c)cleaning(boardSize,now_x-1,now_y,c);
+		 }
+		 if(now_y+1<=boardSize){
+			 if(points[now_x][now_y+1]==c)cleaning(boardSize,now_x,now_y+1,c);
+		 }
+		 if(now_y-1>0){
+			 if(points[now_x][now_y-1]==c)cleaning(boardSize,now_x,now_y-1,c);
+		 }
+	 }
+	 
+	 //reset the judgeBoard
+	 public void reset(){
+		 for(int i=1; i<=size ;i++)
+				for(int j=1; j<=size ;j++)
+					judgeBoard[i][j]=points[i][j];
+	 }
 	
 	//judge whether can placed chess at coordinate x,y
 	 public void judgeChessDead(int x, int y, char c){
 		 char d=' ';
 		 if(c=='b')d='w';
-		 else if(c=='w')d='b';
-		 boolean upChessDead, leftChessDead, rightChessDead, downChessDead;		 
-			for(int i=1; i<=size ;i++)
-				for(int j=1; j<=size ;j++)
-					judgeBoard[i][j]=points[i][j];
+		 else if(c=='w')d='b';	
+		 
+		    reset();
+		    judgeBoard[x][y]=c;
+		    if(x+1<=size)
+		    	if(points[x+1][y]==d){
+		    		judgeing=true;
+		    		judgeing(size,x+1, y, d);
+		    		if(judgeing)
+		    			cleaning(size,x+1, y, d);
+		    }
+			
+			reset();
 			judgeBoard[x][y]=c;
-			
-			judgeing=true;
-			judgeing(size,x+1, y, d);
-			if(judgeing){
-				rightChessDead=true;
-				System.out.println("true");
+			if(x-1>0)
+				if(points[x-1][y]==d){
+					judgeing=true;
+					judgeing(size,x-1, y, d);
+					if(judgeing)
+						cleaning(size,x-1, y, d);
 			}
 			
-			
-			judgeing=true;
-			judgeing(size,x-1, y, d);
-			if(judgeing){
-				leftChessDead=true;
-				System.out.println("true");
+			reset();
+			judgeBoard[x][y]=c;
+			if(y+1<=size)
+				if(points[x][y+1]==d){
+					judgeing=true;
+					judgeing(size,x, y+1, d);
+					if(judgeing)
+						cleaning(size,x, y+1, d);
 			}
 			
-			judgeing=true;
-			judgeing(size,x, y+1, d);
-			if(judgeing){
-				downChessDead=true;
-				System.out.println("true");
-			}
-			
-			judgeing=true;
-			judgeing(size,x, y-1, d);
-			if(judgeing){
-				upChessDead=true;
-				System.out.println("true");
-			}
+			reset();
+			judgeBoard[x][y]=c;
+			if(y-1>0)
+				if(points[x][y-1]==d){
+					judgeing=true;
+					judgeing(size,x, y-1, d);
+					if(judgeing)
+						cleaning(size,x, y-1, d);
+			}	
 		 
 	 }
-	 
-	@Override
-    public void mouseClicked(){
+
+   
+	//judge in function "draw", if mousePressed, placed the chess.(released then can placed again)
+    public void placeChess(){
+
 		int x=getCoordinate()[0];
 		int y=getCoordinate()[1];
-		if(x>0 && y>0){
+		if(x>0 && y>0 && points[x][y]=='n'){
 			if(nowStep%2==1){
 				judgeChessDead(x,y,'b');
 				points[x][y]='b';
@@ -172,6 +215,10 @@ public class ChessBoard extends PApplet {
 		}
 		
    }
+    
+    public void mouseReleased(){
+    	canPlaceChess=true;
+    }
 
 
 }
