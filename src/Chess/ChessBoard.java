@@ -20,6 +20,7 @@ public class ChessBoard extends PApplet {
 	private char[][] judgeBoard=new char[size+1][size+1];
 	private boolean judgeing;
 	private boolean canPlaceChess=true;
+	private boolean isForbiddenPoint=false;
 	
 	public void setup() {
 		size(width, height);
@@ -35,7 +36,7 @@ public class ChessBoard extends PApplet {
 	
 	public void draw() 
 	{  
-		if(mousePressed && canPlaceChess){
+		if(mousePressed && canPlaceChess && !isForbiddenPoint){
 			placeChess();
 			canPlaceChess=false;
 		}
@@ -50,8 +51,14 @@ public class ChessBoard extends PApplet {
 			line(chessX,chessY+i*unit,chessX+chessBoardWidth,chessY+i*unit);
 		}
 		
+		int x=getCoordinate()[0];
+		int y=getCoordinate()[1];
+		if(nowStep%2==1)
+			judgeForbiddenPoint(x,y,'b');
+		else if(nowStep%2==0)
+			judgeForbiddenPoint(x,y,'w');
 		
-		if(getCoordinate()[0]>0 && getCoordinate()[1]>0){
+		if(x>0 && y>0 && !isForbiddenPoint){
 			if(nowStep%2==1){
 				fill(0);
 				ellipse(chessX+(getCoordinate()[0]-1)*unit, chessY+(getCoordinate()[1]-1)*unit,50,50);
@@ -148,6 +155,7 @@ public class ChessBoard extends PApplet {
 	
 	//judge whether can placed chess at coordinate x,y
 	 public void judgeChessDead(int x, int y, char c){
+
 		 char d=' ';
 		 if(c=='b')d='w';
 		 else if(c=='w')d='b';	
@@ -170,6 +178,7 @@ public class ChessBoard extends PApplet {
 					judgeing(size,x-1, y, d);
 					if(judgeing)
 						cleaning(size,x-1, y, d);
+
 			}
 			
 			reset();
@@ -193,6 +202,68 @@ public class ChessBoard extends PApplet {
 			}	
 		 
 	 }
+	 
+	//use in function "draw" that always judge whether the chess can place at this place
+	 public void judgeForbiddenPoint(int x, int y, char c){
+		 boolean isEatSomeChess=false;
+		 char d=' ';
+		 if(c=='b')d='w';
+		 else if(c=='w')d='b';	
+		 isForbiddenPoint=false;
+		 
+		    reset();
+		    judgeBoard[x][y]=c;
+		    if(x+1<=size)
+		    	if(points[x+1][y]==d){
+		    		judgeing=true;
+		    		judgeing(size,x+1, y, d);
+		    		if(judgeing){
+		    			isEatSomeChess=true;
+		    		}
+		    }
+			
+			reset();
+			judgeBoard[x][y]=c;
+			if(x-1>0)
+				if(points[x-1][y]==d){
+					judgeing=true;
+					judgeing(size,x-1, y, d);
+					if(judgeing){
+						isEatSomeChess=true;
+					}
+			}
+			
+			reset();
+			judgeBoard[x][y]=c;
+			if(y+1<=size)
+				if(points[x][y+1]==d){
+					judgeing=true;
+					judgeing(size,x, y+1, d);
+					if(judgeing){
+						isEatSomeChess=true;
+					}
+			}
+			
+			reset();
+			judgeBoard[x][y]=c;
+			if(y-1>0)
+				if(points[x][y-1]==d){
+					judgeing=true;
+					judgeing(size,x, y-1, d);
+					if(judgeing){
+						isEatSomeChess=true;
+					}
+			}	
+			
+			if(!isEatSomeChess){
+				judgeing=true;
+				reset();
+				judgeing(size,x,y,c);
+				if(judgeing)
+					isForbiddenPoint=true;				
+			}
+		 
+	 }
 
    
 	//judge in function "draw", if mousePressed, placed the chess.(released then can placed again)
@@ -210,8 +281,9 @@ public class ChessBoard extends PApplet {
 				judgeChessDead(x,y,'w');
 				points[x][y]='w';
 				stones.add(new Stone(x,y,nowStep,"white",this,this));
+				
 			}
-			nowStep++;
+				nowStep++;
 		}
 		
    }
