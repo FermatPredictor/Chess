@@ -21,6 +21,7 @@ public class ChessBoard extends PApplet {
 	private boolean judgeing;
 	private boolean canPlaceChess=true;
 	private boolean isForbiddenPoint=false;
+	public boolean isClicked = false;
 	
 	public void setup() {
 		size(width, height);
@@ -35,11 +36,13 @@ public class ChessBoard extends PApplet {
 	}
 	
 	public void draw() 
-	{  
+	{
 		if(mousePressed && canPlaceChess && !isForbiddenPoint){
 			placeChess();
 			canPlaceChess=false;
+			isClicked = true;
 		}
+		
 		background(52,203,41);
 		fill(168,134,87);
 		rect(chessX-20,chessY-20,chessBoardWidth+40,chessBoardWidth+40);

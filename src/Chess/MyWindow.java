@@ -26,10 +26,11 @@ public class MyWindow extends JFrame {
 	private Socket socket;
 	private PrintWriter writer;
 	private BufferedReader reader;
-	ChessBoard applet1 = new ChessBoard();
+	private ChessBoard applet1;
+	
 	
 	public MyWindow() {
-		
+		applet1 = new ChessBoard();
 		setLayout(null);
 		applet1.init();
 		applet1.start();
@@ -86,7 +87,14 @@ public class MyWindow extends JFrame {
 			this.reader = reader;
 		}
 		public void run() {
-			
+			while(true) {
+				System.out.println(applet1.isClicked);
+				if(applet1.isClicked) {
+					sendMessage("123");
+					System.out.println("123");
+					applet1.isClicked = false;
+				}
+			}
 		}
 	}
 }

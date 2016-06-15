@@ -14,6 +14,7 @@ public class Server {
 	
 	private int[] port = new int[2];
 	private String[] player = new String[2];
+	public boolean[] isPlayerTurn = new boolean[2];
 	private ServerSocket serverSocket;
 	private List<ConnectionThread> connections = new ArrayList<ConnectionThread>();
 	
@@ -28,6 +29,10 @@ public class Server {
 	
 	public void runForever() {
 		System.out.println("Server starts waiting for client.");
+		player[0] = "player0";
+		player[1] = "player1";
+		isPlayerTurn[0] = true;
+		isPlayerTurn[1] = false;
 	    
 		for(int i = 0; i < 2; i ++) {
 			try {
@@ -65,7 +70,42 @@ public class Server {
 			}
 		}
 		public void run() {
-			
+			while(true) {
+				try {
+					int isRight = 1;
+					String line = this.reader.readLine();
+					System.out.println(line);
+					
+//					for(int i = 0; i < 2; i ++) {
+//						if(port[i] == this.socket.getPort() && line.length() > 0)
+//							    player[i] = line;
+//					}
+//					
+//					for(int i = 0; i < 2; i ++) {
+//						if(player[i].equals("player" + Integer.toString(i)))
+//							isRight = 0;
+//					}
+//					
+//					if(isRight == 1) {
+//						for(int i = 1; i < 2; i ++) {
+//						    if(!player[i].equals(player[0]))
+//						    	isRight = 0;
+//						}
+//						if(isRight == 1) {
+//						    broadcast("true");
+//						}
+//						else {
+//						    broadcast("NotMatch");
+//						}
+//						for(int i = 0; i < 2; i ++) {
+//							player[i] = "player" + Integer.toString(i);
+//						}
+//					}
+					
+				} catch (IOException e){
+					e.printStackTrace();
+				}
+			}
 		}
 		public void sendMessage(String message) {
 			this.writer.println(message);
