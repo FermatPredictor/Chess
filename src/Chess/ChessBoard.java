@@ -22,6 +22,9 @@ public class ChessBoard extends PApplet {
 	private boolean canPlaceChess=true;
 	private boolean isForbiddenPoint=false;
 	public boolean isClicked = false;
+	private int caps=0;
+	private int capsPoint[]=new int[2];//the coordinate of eaten chess, only use in judge ko. 
+	private int judgeCaps=0;
 	
 	public void setup() {
 		size(width, height);
@@ -131,8 +134,12 @@ public class ChessBoard extends PApplet {
 	 public void cleaning(int boardSize, int now_x, int now_y, char c){
 		 
 		 for(Stone stone: stones){
-			 if(!stone.isDead && stone.x==now_x && stone.y==now_y)
+			 if(!stone.isDead && stone.x==now_x && stone.y==now_y){
 				 stone.isDead=true;
+				 caps++;
+				 capsPoint[0]=stone.x;
+				 capsPoint[1]=stone.y;
+			 }
 		 }
 		 points[now_x][now_y]='n';
 		 if(now_x+1<=boardSize){
@@ -162,7 +169,7 @@ public class ChessBoard extends PApplet {
 		 char d=' ';
 		 if(c=='b')d='w';
 		 else if(c=='w')d='b';	
-		 
+		 caps=0;
 		    reset();
 		    judgeBoard[x][y]=c;
 		    if(x+1<=size)
@@ -206,6 +213,25 @@ public class ChessBoard extends PApplet {
 		 
 	 }
 	 
+	//use in function "judgeForbiddenPoint" that when some chess be eaten, count it(if>1, may repeat count)
+	 private void countCaps(int boardSize, int now_x, int now_y, char c){
+		 
+		     judgeCaps++;
+			 judgeBoard[now_x][now_y]='j';
+			 if(now_x+1<=boardSize){
+				 if(judgeBoard[now_x+1][now_y]==c)countCaps(boardSize,now_x+1,now_y,c);
+			 }
+			 if(now_x-1>0){
+				 if(judgeBoard[now_x-1][now_y]==c)countCaps(boardSize,now_x-1,now_y,c);
+			 }
+			 if(now_y+1<=boardSize){
+				 if(judgeBoard[now_x][now_y+1]==c)countCaps(boardSize,now_x,now_y+1,c);
+			 }
+			 if(now_y-1>0){
+				 if(judgeBoard[now_x][now_y-1]==c)countCaps(boardSize,now_x,now_y-1,c);
+			 }
+	 }
+	 
 	//use in function "draw" that always judge whether the chess can place at this place
 	 public void judgeForbiddenPoint(int x, int y, char c){
 		 boolean isEatSomeChess=false;
@@ -213,6 +239,7 @@ public class ChessBoard extends PApplet {
 		 if(c=='b')d='w';
 		 else if(c=='w')d='b';	
 		 isForbiddenPoint=false;
+		 judgeCaps=0;
 		 
 		    reset();
 		    judgeBoard[x][y]=c;
@@ -222,6 +249,8 @@ public class ChessBoard extends PApplet {
 		    		judgeing(size,x+1, y, d);
 		    		if(judgeing){
 		    			isEatSomeChess=true;
+		    			reset();
+		    			countCaps(size,x+1, y, d);
 		    		}
 		    }
 			
@@ -233,6 +262,8 @@ public class ChessBoard extends PApplet {
 					judgeing(size,x-1, y, d);
 					if(judgeing){
 						isEatSomeChess=true;
+						reset();
+						countCaps(size,x-1, y, d);
 					}
 			}
 			
@@ -244,6 +275,8 @@ public class ChessBoard extends PApplet {
 					judgeing(size,x, y+1, d);
 					if(judgeing){
 						isEatSomeChess=true;
+						reset();
+						countCaps(size,x, y+1, d);
 					}
 			}
 			
@@ -255,10 +288,14 @@ public class ChessBoard extends PApplet {
 					judgeing(size,x, y-1, d);
 					if(judgeing){
 						isEatSomeChess=true;
+						reset();
+						countCaps(size,x, y-1, d);
 					}
 			}	
 			
-			if(!isEatSomeChess){
+			if(caps==1 && x==capsPoint[0] && y==capsPoint[1] && judgeCaps==1)//rule of ko
+				isForbiddenPoint=true;
+			else if(!isEatSomeChess){
 				judgeing=true;
 				reset();
 				judgeing(size,x,y,c);
