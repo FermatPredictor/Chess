@@ -11,7 +11,7 @@ import java.net.UnknownHostException;
 
 import javax.swing.JFrame;
 
-public class MyWindow extends JFrame implements Runnable{
+public class MyWindow extends JFrame{
 	/**
 	 * 
 	 */
@@ -26,8 +26,6 @@ public class MyWindow extends JFrame implements Runnable{
 	
 	
 	public MyWindow() {
-		Thread m = new Thread(this);
-		m.start();
 		applet1 = new ChessBoard();
 		setLayout(null);
 		applet1.init();
@@ -91,13 +89,6 @@ public class MyWindow extends JFrame implements Runnable{
 					applet1.isClicked = false;
 				}
 			}
-		}
-	}
-
-	@Override
-	public void run() {
-		// TODO Auto-generated method stub
-		while(true) {
 		}
 	}
 }
