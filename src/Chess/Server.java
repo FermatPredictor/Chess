@@ -8,13 +8,12 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class Server {
 	
 	private int[] port = new int[2];
 	private String[] player = new String[2];
-	public boolean[] isPlayerTurn = new boolean[2];
+	public boolean isPlayerOneTurn = true;
 	private ServerSocket serverSocket;
 	private List<ConnectionThread> connections = new ArrayList<ConnectionThread>();
 	
@@ -31,8 +30,6 @@ public class Server {
 		System.out.println("Server starts waiting for client.");
 		player[0] = "player0";
 		player[1] = "player1";
-		isPlayerTurn[0] = true;
-		isPlayerTurn[1] = false;
 	    
 		for(int i = 0; i < 2; i ++) {
 			try {
@@ -74,7 +71,18 @@ public class Server {
 				try {
 					int isRight = 1;
 					String line = this.reader.readLine();
-					System.out.println(line);
+					//System.out.println(line);
+					
+					if(line.length() > 0) {
+						if(isPlayerOneTurn == true) {
+							isPlayerOneTurn = false;
+						}
+						else {
+							isPlayerOneTurn = true;
+						}
+						broadcast("123");
+						System.out.println("isPlayerOneTurn : " + isPlayerOneTurn);
+					}
 					
 //					for(int i = 0; i < 2; i ++) {
 //						if(port[i] == this.socket.getPort() && line.length() > 0)

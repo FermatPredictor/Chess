@@ -1,8 +1,6 @@
 package Chess;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -11,11 +9,9 @@ import java.net.ConnectException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import javax.imageio.ImageIO;
 import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
 
-public class MyWindow extends JFrame {
+public class MyWindow extends JFrame implements Runnable{
 	/**
 	 * 
 	 */
@@ -30,13 +26,14 @@ public class MyWindow extends JFrame {
 	
 	
 	public MyWindow() {
+		Thread m = new Thread(this);
+		m.start();
 		applet1 = new ChessBoard();
 		setLayout(null);
 		applet1.init();
 		applet1.start();
 		applet1.setFocusable(true);
 		this.setContentPane(applet1);
-		
 	}
 	
 	public MyWindow(String IPAddress, int portNum) {
@@ -88,13 +85,19 @@ public class MyWindow extends JFrame {
 		}
 		public void run() {
 			while(true) {
-				System.out.println(applet1.isClicked);
+				System.out.print("");
 				if(applet1.isClicked) {
-					sendMessage("123");
-					System.out.println("123");
+					sendMessage("true");
 					applet1.isClicked = false;
 				}
 			}
+		}
+	}
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		while(true) {
 		}
 	}
 }

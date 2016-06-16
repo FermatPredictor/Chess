@@ -2,7 +2,7 @@ package Chess;
 
 import javax.swing.JFrame;
 
-public class Main extends JFrame{
+public class Main{
 	
 	private final static int width = 1200, height = 700;
 	public static void main(String [] args){
