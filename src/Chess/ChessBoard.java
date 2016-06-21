@@ -3,6 +3,7 @@ package Chess;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
@@ -32,6 +33,7 @@ public class ChessBoard extends PApplet {
 	private int capsPoint[]=new int[2];//the coordinate of eaten chess, only use in judge ko. 
 	private int judgeCaps=0;
 	String Data[][];
+	String Record[][];
 	ArrayList tmpxList = new ArrayList();
 	ArrayList tmpyList = new ArrayList();
 	
@@ -53,11 +55,33 @@ public class ChessBoard extends PApplet {
 				Data[i][0] = (String) tmpxList.get(i);
 				Data[i][1] = (String) tmpyList.get(i);
 			}
-			for(int i = 0; i < Data.length; i++) {
+			/*for(int i = 0; i < Data.length; i++) {
 				for(int j = 0; j < Data[0].length; j++)
 				System.out.print(i+"-"+j+" "+Data[i][j] + " ");
 				System.out.println();
+			}*/
+			
+			Record = new String [tmpxList.size()+1][2];
+			
+			for(int i = 0; i < Data.length; i++) {
+			for(int j = 0; j < Data[0].length; j++)
+			Record[i][j] = Data[i][j];
+		    }
+			Record[tmpxList.size()][0] = "§A¦n";
+			Record[tmpxList.size()][1] = "²±´­";
+			
+			FileWriter fw = new FileWriter("record.txt");
+			for(int i = 0; i < Record.length; i++) {
+				fw.write(Record[i][0] + " " + Record[i][1] + "\r\n");
 			}
+			fw.flush();
+			fw.close();
+			
+			for(int i = 0; i < Record.length; i++) {
+			for(int j = 0; j < Record[0].length; j++)
+			System.out.print(i+"-"+j+" "+Record[i][j] + " ");
+			System.out.println();
+		    }
 			
 		} catch (IOException e) {
 		}
