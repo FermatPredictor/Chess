@@ -46,19 +46,6 @@ public class ChessBoard extends PApplet {
 			fr.close();
 			System.out.println(information);
 			
-			/*FileWriter fw = new FileWriter("record.txt");
-			for(int i = 0; i < Record.length; i++) {
-				fw.write(Record[i][0] + " " + Record[i][1] + "\r\n");
-			}
-			fw.flush();
-			fw.close();
-			
-			for(int i = 0; i < Record.length; i++) {
-			for(int j = 0; j < Record[0].length; j++)
-			System.out.print(i+"-"+j+" "+Record[i][j] + " ");
-			System.out.println();
-		    }*/
-			
 		} catch (IOException e) {
 		}
 	}
