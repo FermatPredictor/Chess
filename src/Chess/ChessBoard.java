@@ -38,7 +38,55 @@ public class ChessBoard extends PApplet {
 	ArrayList tmpyList = new ArrayList();
 	String information="";
 	
-
+	public ChessBoard() {
+		try {
+			FileReader fr = new FileReader("record.txt");
+			BufferedReader br = new BufferedReader(fr);
+			
+			while(br.ready()) {
+				//System.out.print((char)br.read());
+				String tempArray[]  = br.readLine().split("\\s");
+				tmpxList.add(tempArray[0]);
+				tmpyList.add(tempArray[1]);
+			}
+			fr.close();
+			
+			Data = new String [tmpxList.size()][2];
+			for(int i = 0; i< tmpxList.size(); i++){
+				Data[i][0] = (String) tmpxList.get(i);
+				Data[i][1] = (String) tmpyList.get(i);
+			}
+			/*for(int i = 0; i < Data.length; i++) {
+				for(int j = 0; j < Data[0].length; j++)
+				System.out.print(i+"-"+j+" "+Data[i][j] + " ");
+				System.out.println();
+			}*/
+			
+			Record = new String [tmpxList.size()+1][2];
+			
+			for(int i = 0; i < Data.length; i++) {
+			for(int j = 0; j < Data[0].length; j++)
+			Record[i][j] = Data[i][j];
+		    }
+			Record[tmpxList.size()][0] = "§A¦n";
+			Record[tmpxList.size()][1] = "²±´­";
+			
+			FileWriter fw = new FileWriter("record.txt");
+			for(int i = 0; i < Record.length; i++) {
+				fw.write(Record[i][0] + " " + Record[i][1] + "\r\n");
+			}
+			fw.flush();
+			fw.close();
+			
+			/*for(int i = 0; i < Record.length; i++) {
+			for(int j = 0; j < Record[0].length; j++)
+			System.out.print(i+"-"+j+" "+Record[i][j] + " ");
+			System.out.println();
+		    }*/
+			
+		} catch (IOException e) {
+		}
+	}
 	
 	public void setup() {
 		size(width, height);
