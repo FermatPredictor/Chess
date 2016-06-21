@@ -95,6 +95,7 @@ public class ChessBoard extends PApplet {
 		this.whiteCurrent=loadImage("white_current.png");
 		this.blackCurrent=loadImage("black_current.png");
 		stones=new ArrayList<Stone>();
+		
 		for(int i=1; i<=size ;i++)
 			for(int j=1; j<=size ;j++)
 				points[i][j]='n';
@@ -378,17 +379,17 @@ public class ChessBoard extends PApplet {
 				judgeChessDead(x,y,'b');
 				points[x][y]='b';
 				stones.add(new Stone(x,y,nowStep,"black",this,this));
-				information.concat(";B["+x+y+"]");
+				information=information.concat(";B["+x+y+"]");
 			}
 			else if(nowStep%2==0){
 				judgeChessDead(x,y,'w');
 				points[x][y]='w';
 				stones.add(new Stone(x,y,nowStep,"white",this,this));
-				information.concat(";W["+x+y+"]");
+				information=information.concat(";W["+x+y+"]");
 			}
 				nowStep++;
+				System.out.println(information);
 		}
-		System.out.println(information);
 		
    }
     
