@@ -56,6 +56,10 @@ public class ChessBoard extends PApplet {
 		this.black=loadImage("black.PNG");
 		this.whiteCurrent=loadImage("white_current.png");
 		this.blackCurrent=loadImage("black_current.png");
+        white.resize((int)unit, (int)unit);
+        black.resize((int)unit, (int)unit);
+        whiteCurrent.resize((int)unit, (int)unit);
+        blackCurrent.resize((int)unit, (int)unit);
 		stones=new ArrayList<Stone>();
 		
 		for(int i=1; i<=size ;i++)
@@ -89,21 +93,27 @@ public class ChessBoard extends PApplet {
 		else if(nowStep%2==0)
 			judgeForbiddenPoint(x,y,'w');
 		
-		if(x>0 && y>0 && !isForbiddenPoint){
+		if(x>0 && y>0 && !isForbiddenPoint && points[x][y]=='n'){
 			if(nowStep%2==1){
 				fill(0);
-				ellipse(chessX+(getCoordinate()[0]-1)*unit, chessY+(getCoordinate()[1]-1)*unit,50,50);
+				ellipse(chessX+(getCoordinate()[0]-1)*unit, chessY+(getCoordinate()[1]-1)*unit,unit*(float)0.8,unit*(float)0.8);
 			}
 			else if(nowStep%2==0){
 				fill(255);
-				ellipse(chessX+(getCoordinate()[0]-1)*unit, chessY+(getCoordinate()[1]-1)*unit,50,50);
+				ellipse(chessX+(getCoordinate()[0]-1)*unit, chessY+(getCoordinate()[1]-1)*unit,unit*(float)0.8,unit*(float)0.8);
 			}
 		}
 		
 		
 		if(!stones.isEmpty()){
 			for(Stone stone: stones){
-				if(!stone.isDead){
+				if(stone.step==nowStep-1){
+					if(stone.color.equals("black"))
+						image(blackCurrent,chessX+(stone.x-1)*unit-unit/2, chessY+(stone.y-1)*unit-unit/2);
+					else if(stone.color.equals("white"))
+						image(whiteCurrent,chessX+(stone.x-1)*unit-unit/2, chessY+(stone.y-1)*unit-unit/2);
+				}
+				else if(!stone.isDead){
 					if(stone.color.equals("black"))
 						image(black,chessX+(stone.x-1)*unit-unit/2, chessY+(stone.y-1)*unit-unit/2);
 					else if(stone.color.equals("white"))
@@ -341,13 +351,17 @@ public class ChessBoard extends PApplet {
 				judgeChessDead(x,y,'b');
 				points[x][y]='b';
 				stones.add(new Stone(x,y,nowStep,"black",this,this));
-				information=information.concat(";B["+x+y+"]");
+				char ch_x=(char)((int)'a'+x-1);
+				char ch_y=(char)((int)'a'+y-1);
+				information=information.concat(";B["+ch_x+ch_y+"]");
 			}
 			else if(nowStep%2==0){
 				judgeChessDead(x,y,'w');
 				points[x][y]='w';
 				stones.add(new Stone(x,y,nowStep,"white",this,this));
-				information=information.concat(";W["+x+y+"]");
+				char ch_x=(char)((int)'a'+x-1);
+				char ch_y=(char)((int)'a'+y-1);
+				information=information.concat(";W["+ch_x+ch_y+"]");
 			}
 				nowStep++;
 				//System.out.println(information);
