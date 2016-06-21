@@ -65,6 +65,7 @@ public class ChessBoard extends PApplet {
 		for(int i=1; i<=size ;i++)
 			for(int j=1; j<=size ;j++)
 				points[i][j]='n';
+		loading();
 	}
 	
 	public void draw() 
@@ -198,7 +199,7 @@ public class ChessBoard extends PApplet {
 					judgeBoard[i][j]=points[i][j];
 	 }
 	
-	//judge whether can placed chess at coordinate x,y
+	//judge whether can placed chess at coordinate x,y, if so, then clear the captured chess.
 	 public void judgeChessDead(int x, int y, char c){
 
 		 char d=' ';
@@ -364,7 +365,6 @@ public class ChessBoard extends PApplet {
 				information=information.concat(";W["+ch_x+ch_y+"]");
 			}
 				nowStep++;
-				//System.out.println(information);
 				
 				try{
 					FileWriter fw = new FileWriter("record.txt");
@@ -377,6 +377,42 @@ public class ChessBoard extends PApplet {
 		}
 		
    }
+    
+	//use in the function "loading"
+    private void placeChess(char color, int x, int y){
+
+		if(x>0 && y>0 && points[x][y]=='n'){
+			if(color=='b'){
+				judgeChessDead(x,y,'b');
+				points[x][y]='b';
+				stones.add(new Stone(x,y,nowStep,"black",this,this));
+			}
+			else if(color=='w'){
+				judgeChessDead(x,y,'w');
+				points[x][y]='w';
+				stones.add(new Stone(x,y,nowStep,"white",this,this));
+			}
+				nowStep++;	
+		}
+   }
+    
+    private void loading(){
+    	stones.clear();
+    	nowStep=1;
+    	int begin=information.indexOf(';',1);
+    	System.out.println(begin);
+    	if(begin!=-1)
+    		while(begin<information.length()){
+    			int x=information.charAt(begin+3)-'a'+1;
+    			int y=information.charAt(begin+4)-'a'+1;
+    			if(nowStep%2==1)
+    				placeChess('b',x,y);
+    			else if(nowStep%2==0)
+    				placeChess('w',x,y);
+    			System.out.println(x+" "+y);
+    			begin+=6;
+    		}	
+    }
     
     public void mouseReleased(){
     	canPlaceChess=true;
