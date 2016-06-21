@@ -3,6 +3,7 @@ package Chess;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
@@ -32,37 +33,12 @@ public class ChessBoard extends PApplet {
 	private int capsPoint[]=new int[2];//the coordinate of eaten chess, only use in judge ko. 
 	private int judgeCaps=0;
 	String Data[][];
+	String Record[][];
 	ArrayList tmpxList = new ArrayList();
 	ArrayList tmpyList = new ArrayList();
 	String information="";
 	
-	public ChessBoard() {
-		try {
-			FileReader fr = new FileReader("record.txt");
-			BufferedReader br = new BufferedReader(fr);
-			
-			while(br.ready()) {
-				//System.out.print((char)br.read());
-				String tempArray[]  = br.readLine().split("\\s");
-				tmpxList.add(tempArray[0]);
-				tmpyList.add(tempArray[1]);
-			}
-			fr.close();
-			
-			Data = new String [tmpxList.size()][2];
-			for(int i = 0; i< tmpxList.size(); i++){
-				Data[i][0] = (String) tmpxList.get(i);
-				Data[i][1] = (String) tmpyList.get(i);
-			}
-			for(int i = 0; i < Data.length; i++) {
-				for(int j = 0; j < Data[0].length; j++)
-				System.out.print(i+"-"+j+" "+Data[i][j] + " ");
-				System.out.println();
-			}
-			
-		} catch (IOException e) {
-		}
-	}
+
 	
 	public void setup() {
 		size(width, height);
