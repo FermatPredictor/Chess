@@ -32,10 +32,6 @@ public class ChessBoard extends PApplet {
 	private int caps=0;
 	private int capsPoint[]=new int[2];//the coordinate of eaten chess, only use in judge ko. 
 	private int judgeCaps=0;
-	String Data[][];
-	String Record[][];
-	ArrayList tmpxList = new ArrayList();
-	ArrayList tmpyList = new ArrayList();
 	String information="";
 	
 	public ChessBoard() {
@@ -45,40 +41,19 @@ public class ChessBoard extends PApplet {
 			
 			while(br.ready()) {
 				//System.out.print((char)br.read());
-				String tempArray[]  = br.readLine().split("\\s");
-				tmpxList.add(tempArray[0]);
-				tmpyList.add(tempArray[1]);
+				information  = br.readLine();
 			}
 			fr.close();
+			System.out.println(information);
 			
-			Data = new String [tmpxList.size()][2];
-			for(int i = 0; i< tmpxList.size(); i++){
-				Data[i][0] = (String) tmpxList.get(i);
-				Data[i][1] = (String) tmpyList.get(i);
-			}
-			/*for(int i = 0; i < Data.length; i++) {
-				for(int j = 0; j < Data[0].length; j++)
-				System.out.print(i+"-"+j+" "+Data[i][j] + " ");
-				System.out.println();
-			}*/
-			
-			Record = new String [tmpxList.size()+1][2];
-			
-			for(int i = 0; i < Data.length; i++) {
-			for(int j = 0; j < Data[0].length; j++)
-			Record[i][j] = Data[i][j];
-		    }
-			Record[tmpxList.size()][0] = "§A¦n";
-			Record[tmpxList.size()][1] = "²±´­";
-			
-			FileWriter fw = new FileWriter("record.txt");
+			/*FileWriter fw = new FileWriter("record.txt");
 			for(int i = 0; i < Record.length; i++) {
 				fw.write(Record[i][0] + " " + Record[i][1] + "\r\n");
 			}
 			fw.flush();
 			fw.close();
 			
-			/*for(int i = 0; i < Record.length; i++) {
+			for(int i = 0; i < Record.length; i++) {
 			for(int j = 0; j < Record[0].length; j++)
 			System.out.print(i+"-"+j+" "+Record[i][j] + " ");
 			System.out.println();
@@ -388,7 +363,16 @@ public class ChessBoard extends PApplet {
 				information=information.concat(";W["+x+y+"]");
 			}
 				nowStep++;
-				System.out.println(information);
+				//System.out.println(information);
+				
+				try{
+					FileWriter fw = new FileWriter("record.txt");
+					fw.write(information + "\r\n");
+					fw.flush();
+					fw.close();
+					System.out.println(information);
+				} catch (IOException e) {
+				}
 		}
 		
    }
