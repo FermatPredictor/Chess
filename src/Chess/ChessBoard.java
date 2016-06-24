@@ -10,13 +10,15 @@ import java.util.Random;
 
 import javax.imageio.ImageIO;
 
+import controlP5.ControlP5;
 import processing.core.PApplet;
 import processing.core.PImage;
 
 public class ChessBoard extends PApplet {
 	
 	private static final long serialVersionUID = 1L;
-	private final static int width = 1000, height = 500;
+	private final static int width = 1200, height = 500;
+	private ControlP5 cp5;
 	private int chessX=100, chessY=50, chessBoardWidth=550;
 	public PImage white, black, whiteCurrent, blackCurrent;
 	private int size=9;
@@ -55,6 +57,7 @@ public class ChessBoard extends PApplet {
 	
 	public void setup() {
 		size(width, height);
+		cp5= new ControlP5(this);
 		this.white=loadImage("white.PNG");
 		this.black=loadImage("black.PNG");
 		this.whiteCurrent=loadImage("white_current.png");
@@ -65,10 +68,21 @@ public class ChessBoard extends PApplet {
         blackCurrent.resize((int)unit, (int)unit);
 		stones=new ArrayList<Stone>();
 		
-		for(int i=1; i<=size ;i++)
-			for(int j=1; j<=size ;j++)
-				points[i][j]='n';
 		loading();
+		
+		//button
+		cp5.addButton("undo").setLabel("Undo")		
+                             .setPosition(700,50)
+                             .setSize(100, 50);
+		cp5.addButton("pass").setLabel("Pass")
+		                     .setPosition(810,50)
+                             .setSize(100, 50);
+		cp5.addButton("resign").setLabel("Resign")
+                               .setPosition(920,50)
+                               .setSize(100, 50);
+		cp5.addButton("estimate").setLabel("Estimate")
+                                 .setPosition(1030,50)
+                                 .setSize(100, 50);
 	}
 	
 	public void draw() 
@@ -412,22 +426,31 @@ public class ChessBoard extends PApplet {
 		}
    }
     
+    //load the record, and place chess from the first step to the last.
     private void loading(){
+    	
     	stones.clear();
     	nowStep=1;
+		for(int i=1; i<=size ;i++)
+			for(int j=1; j<=size ;j++)
+				points[i][j]='n';
+		
     	int begin=information.indexOf(';',1);
     	System.out.println(begin);
     	if(begin!=-1)
     		while(begin<information.length()){
     			int x=information.charAt(begin+3)-'a'+1;
     			int y=information.charAt(begin+4)-'a'+1;
-    			if(nowStep%2==1)
+    			if(nowStep%2==1){
     				placeChess('b',x,y);
-    			else if(nowStep%2==0)
+    			}
+    			else if(nowStep%2==0){
     				placeChess('w',x,y);
+    			}
     			System.out.println(x+" "+y);
     			begin+=6;
-    		}	
+    		}
+    	System.out.println(nowStep);
     }
     
     //this will decide a coordinate that AI want to play.
@@ -482,6 +505,34 @@ public class ChessBoard extends PApplet {
     public void mouseReleased(){
     	canPlaceChess=true;
     }
-
-
+    
+    //button
+    public void undo(){
+    	if(nowStep>1){
+    		information=information.substring(0,information.length()-6);
+			try{
+				FileWriter fw = new FileWriter("record.txt");
+				fw.write(information + "\r\n");
+				fw.flush();
+				fw.close();
+				System.out.println(information);
+			} catch (IOException e) {
+			}
+			
+			loading();
+    	}
+    }
+    
+    public void pass(){
+    	
+    }
+    
+    public void resign(){
+    	
+    }
+    
+    public void estimate(){
+    	
+    }
+    
 }
