@@ -30,9 +30,12 @@ public class ChessBoard extends PApplet {
 	private boolean isForbiddenPoint=false;
 	public boolean isClicked = false;
 	private int caps=0;
-	private int capsPoint[]=new int[2];//the coordinate of eaten chess, only use in judge ko. 
+	private int capsPoint[]=new int[2];//the coordinate of captured chess, only use in judge ko. 
 	private int judgeCaps=0;
 	String information="";
+	private boolean isWhiteAIOn=false;
+	private boolean isBlackAIOn=false;
+	private boolean isAITurn=false;
 	
 	public ChessBoard() {
 		try {
@@ -69,8 +72,19 @@ public class ChessBoard extends PApplet {
 	}
 	
 	public void draw() 
-	{
-		if(mousePressed && canPlaceChess && !isForbiddenPoint){
+	{   
+		if(isWhiteAIOn && nowStep%2==0){
+			isAITurn=true;
+			placeChessForAI('w');
+			isAITurn=false;
+		}
+		else if(isBlackAIOn && nowStep%2==1){
+			isAITurn=true;
+			placeChessForAI('b');
+			isAITurn=false;
+		}
+		
+		if(mousePressed && canPlaceChess && !isForbiddenPoint && !isAITurn){
 			placeChess();
 			canPlaceChess=false;
 			isClicked = true;
@@ -90,9 +104,9 @@ public class ChessBoard extends PApplet {
 		int x=getCoordinate()[0];
 		int y=getCoordinate()[1];
 		if(nowStep%2==1)
-			judgeForbiddenPoint(x,y,'b');
+			isForbiddenPoint=judgeForbiddenPoint(x,y,'b');
 		else if(nowStep%2==0)
-			judgeForbiddenPoint(x,y,'w');
+			isForbiddenPoint=judgeForbiddenPoint(x,y,'w');
 		
 		if(x>0 && y>0 && !isForbiddenPoint && points[x][y]=='n'){
 			if(nowStep%2==1){
@@ -199,7 +213,7 @@ public class ChessBoard extends PApplet {
 					judgeBoard[i][j]=points[i][j];
 	 }
 	
-	//judge whether can placed chess at coordinate x,y, if so, then clear the captured chess.
+	//if the chess places at coordinate x,y and captures some chess, then clear the captured chess.
 	 public void judgeChessDead(int x, int y, char c){
 
 		 char d=' ';
@@ -269,12 +283,12 @@ public class ChessBoard extends PApplet {
 	 }
 	 
 	//use in function "draw" that always judge whether the chess can place at this place
-	 public void judgeForbiddenPoint(int x, int y, char c){
+	 public boolean judgeForbiddenPoint(int x, int y, char c){
 		 boolean isEatSomeChess=false;
 		 char d=' ';
 		 if(c=='b')d='w';
 		 else if(c=='w')d='b';	
-		 isForbiddenPoint=false;
+		 boolean isForbiddenPoint=false;
 		 judgeCaps=0;
 		 
 		    reset();
@@ -338,7 +352,8 @@ public class ChessBoard extends PApplet {
 				if(judgeing)
 					isForbiddenPoint=true;				
 			}
-		 
+			
+			return isForbiddenPoint;	 
 	 }
 
    
@@ -377,6 +392,7 @@ public class ChessBoard extends PApplet {
 		}
 		
    }
+   
     
 	//use in the function "loading"
     private void placeChess(char color, int x, int y){
@@ -413,6 +429,55 @@ public class ChessBoard extends PApplet {
     			begin+=6;
     		}	
     }
+    
+    //this will decide a coordinate that AI want to play.
+    private int[] AIaction(char color){
+    	int point[]=new int[2];
+    	Random random=new Random();
+    	do{
+    	point[0]=random.nextInt(size)+1;
+    	point[1]=random.nextInt(size)+1;
+    	}
+    	while(judgeForbiddenPoint(point[0],point[1],color));
+    	
+    	return point;
+    }
+    
+    private void placeChessForAI(char color){
+    	int point[]=new int[2];
+    	point=AIaction(color);
+		int x=point[0];
+		int y=point[1];
+		if(x>0 && y>0 && points[x][y]=='n'){
+			if(nowStep%2==1){
+				judgeChessDead(x,y,'b');
+				points[x][y]='b';
+				stones.add(new Stone(x,y,nowStep,"black",this,this));
+				char ch_x=(char)((int)'a'+x-1);
+				char ch_y=(char)((int)'a'+y-1);
+				information=information.concat(";B["+ch_x+ch_y+"]");
+			}
+			else if(nowStep%2==0){
+				judgeChessDead(x,y,'w');
+				points[x][y]='w';
+				stones.add(new Stone(x,y,nowStep,"white",this,this));
+				char ch_x=(char)((int)'a'+x-1);
+				char ch_y=(char)((int)'a'+y-1);
+				information=information.concat(";W["+ch_x+ch_y+"]");
+			}
+				nowStep++;
+				
+				try{
+					FileWriter fw = new FileWriter("record.txt");
+					fw.write(information + "\r\n");
+					fw.flush();
+					fw.close();
+					System.out.println(information);
+				} catch (IOException e) {
+				}
+		}
+		
+   }
     
     public void mouseReleased(){
     	canPlaceChess=true;
