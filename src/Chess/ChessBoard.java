@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import javax.imageio.ImageIO;
+import javax.swing.JOptionPane;
 
 import controlP5.ControlP5;
 import processing.core.PApplet;
@@ -21,6 +22,7 @@ public class ChessBoard extends PApplet {
 	private ControlP5 cp5;
 	private int chessX=100, chessY=50, chessBoardWidth=550;
 	public PImage white, black, whiteCurrent, blackCurrent;
+	public PImage whiteCat1, whiteCat2, blackCat1, blackCat2;
 	private int size=9;
 	private float unit=(float)chessBoardWidth/(size-1);
 	private int nowStep=1;
@@ -38,6 +40,7 @@ public class ChessBoard extends PApplet {
 	private boolean isWhiteAIOn=false;
 	private boolean isBlackAIOn=false;
 	private boolean isAITurn=false;
+	private boolean isEnding=false;
 	
 	public ChessBoard() {
 		try {
@@ -62,10 +65,18 @@ public class ChessBoard extends PApplet {
 		this.black=loadImage("black.PNG");
 		this.whiteCurrent=loadImage("white_current.png");
 		this.blackCurrent=loadImage("black_current.png");
+		this.whiteCat1=loadImage("WhiteCat1.png");
+		this.whiteCat2=loadImage("WhiteCat2.png");
+		this.blackCat1=loadImage("BlackCat1.png");
+		this.blackCat2=loadImage("BlackCat2.png");
         white.resize((int)unit, (int)unit);
         black.resize((int)unit, (int)unit);
         whiteCurrent.resize((int)unit, (int)unit);
         blackCurrent.resize((int)unit, (int)unit);
+        whiteCat1.resize(200, 150);
+        blackCat1.resize(200, 150);
+        whiteCat2.resize(200, 150);
+        blackCat2.resize(200, 150);
 		stones=new ArrayList<Stone>();
 		
 		loading();
@@ -115,6 +126,16 @@ public class ChessBoard extends PApplet {
 			line(chessX,chessY+i*unit,chessX+chessBoardWidth,chessY+i*unit);
 		}
 		
+		//character for black and white
+		if(nowStep%2==1){
+			image(blackCat2,700,200);
+			image(whiteCat1,900,200);
+		}
+		else if(nowStep%2==0){
+			image(blackCat1,700,200);
+			image(whiteCat2,900,200);
+		}
+		
 		int x=getCoordinate()[0];
 		int y=getCoordinate()[1];
 		if(nowStep%2==1)
@@ -150,6 +171,9 @@ public class ChessBoard extends PApplet {
 				}
 			}
 		}
+		
+		if(isEnding)
+			System.exit(0);
 		
 	}
 	
@@ -411,7 +435,7 @@ public class ChessBoard extends PApplet {
 	//use in the function "loading"
     private void placeChess(char color, int x, int y){
 
-		if(x>0 && y>0 && points[x][y]=='n'){
+		if(x>0 && y>0 && x<=size && y<=size && points[x][y]=='n'){
 			if(color=='b'){
 				judgeChessDead(x,y,'b');
 				points[x][y]='b';
@@ -422,8 +446,9 @@ public class ChessBoard extends PApplet {
 				points[x][y]='w';
 				stones.add(new Stone(x,y,nowStep,"white",this,this));
 			}
-				nowStep++;	
 		}
+		//if one pass, still add a step 
+		nowStep++;	
    }
     
     //load the record, and place chess from the first step to the last.
@@ -524,11 +549,25 @@ public class ChessBoard extends PApplet {
     }
     
     public void pass(){
+		char ch_x=(char)((int)'a'+size);
+		char ch_y=(char)((int)'a'+size);
+		if(nowStep%2==1)
+			information=information.concat(";B["+ch_x+ch_y+"]");
+		else if(nowStep%2==0)
+			information=information.concat(";W["+ch_x+ch_y+"]");
+		nowStep++;
     	
     }
     
     public void resign(){
-    	
+    	if(nowStep%2==1){
+    		JOptionPane.showMessageDialog(null,"White win by resignation.");
+    		isEnding=true;
+    	}
+    	else if(nowStep%2==0){
+    		JOptionPane.showMessageDialog(null,"Black win by resignation.");
+    		isEnding=true;
+    	}
     }
     
     public void estimate(){
