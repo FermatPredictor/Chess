@@ -33,6 +33,7 @@ public class ChessBoard extends PApplet {
 	private char[][] judgeBoard=new char[size+1][size+1];
 	private int[][] estimateBoard=new int[size+1][size+1];
 	private int[][] distanceMap=new int[size+1][size+1];//use in estimate, count the distance between null point and a chess
+	private int[][] AIBoard=new int[size+1][size+1];
 	private boolean judgeing;
 	private boolean canPlaceChess=true;
 	private boolean isForbiddenPoint=false;
@@ -453,7 +454,7 @@ public class ChessBoard extends PApplet {
 					fw.write(information + "\r\n");
 					fw.flush();
 					fw.close();
-					System.out.println(information);
+					//System.out.println(information);
 				} catch (IOException e) {
 				}
 		}
@@ -490,7 +491,7 @@ public class ChessBoard extends PApplet {
 				points[i][j]='n';
 		
     	int begin=information.indexOf(';',1);
-    	System.out.println(begin);
+    	//System.out.println(begin);
     	if(begin!=-1)
     		while(begin<information.length()){
     			int x=information.charAt(begin+3)-'a'+1;
@@ -501,21 +502,35 @@ public class ChessBoard extends PApplet {
     			else if(nowStep%2==0){
     				placeChess('w',x,y);
     			}
-    			System.out.println(x+" "+y);
+    			//System.out.println(x+" "+y);
     			begin+=6;
     		}
-    	System.out.println(nowStep);
+    	//System.out.println(nowStep);
     }
     
     //this will decide a coordinate that AI want to play.
     private int[] AIaction(char color){
     	int point[]=new int[2];
+    	int branch=1;
+    	for(int i=1; i<=size ;i++)
+			for(int j=1; j<=size ;j++)
+				AIBoard[i][j]=0;
+    	
+    	for(int i=1; i<=size ;i++)
+			for(int j=1; j<=size ;j++)
+				if(points[i][j]=='n' && !judgeForbiddenPoint(i,j,color)){
+					AIBoard[i][j]=branch;
+					branch++;
+				}
     	Random random=new Random();
-    	do{
-    	point[0]=random.nextInt(size)+1;
-    	point[1]=random.nextInt(size)+1;
-    	}
-    	while(judgeForbiddenPoint(point[0],point[1],color));
+    	int choose=random.nextInt(branch-1)+1;
+    	
+    	for(int i=1; i<=size ;i++)
+			for(int j=1; j<=size ;j++)
+				if(AIBoard[i][j]==choose){
+					point[0]=i;
+					point[1]=j;
+				}
     	
     	return point;
     }
@@ -551,7 +566,7 @@ public class ChessBoard extends PApplet {
 					fw.write(information + "\r\n");
 					fw.flush();
 					fw.close();
-					System.out.println(information);
+					//System.out.println(information);
 				} catch (IOException e) {
 				}
 		}
@@ -571,7 +586,7 @@ public class ChessBoard extends PApplet {
 				fw.write(information + "\r\n");
 				fw.flush();
 				fw.close();
-				System.out.println(information);
+				//System.out.println(information);
 			} catch (IOException e) {
 			}
 			
@@ -710,7 +725,6 @@ public class ChessBoard extends PApplet {
 				fw.write(information + "\r\n");
 				fw.flush();
 				fw.close();
-				System.out.println(information);
 			} catch (IOException e) {
 			}
 			loading();
