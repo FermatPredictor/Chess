@@ -102,6 +102,9 @@ public class ChessBoard extends PApplet {
 		cp5.addButton("estimate").setLabel("Estimate")
                                  .setPosition(1030,50)
                                  .setSize(100, 50);
+		cp5.addButton("newGame").setLabel("NewGame")
+                                .setPosition(700,120)
+                                .setSize(200, 50);
 		
 		minim = new Minim(this);
 		effect[0]=minim.loadFile("Stone.wav");
@@ -670,19 +673,48 @@ public class ChessBoard extends PApplet {
     	    			for(int j=1; j<=size ;j++)
     	    				if(distanceMap[i][j]>=0){
     	    					if(stone.color.equals("black")){
-    	    						estimateBoard[i][j]+=m/(pow(f,distanceMap[i][j]));
+    	    						if((i<stone.x && i<3)||(i>stone.x && i>size-2)||(j<stone.y && j<3)||(j>stone.y && j>size-2))
+    	    							estimateBoard[i][j]+=m/(pow(f,distanceMap[i][j]-2));
+    	    						else
+    	    							estimateBoard[i][j]+=m/(pow(f,distanceMap[i][j]));
     	    					}
     	    					else if(stone.color.equals("white")){
-    	    						estimateBoard[i][j]-=m/(pow(f,distanceMap[i][j]));
+    	    						if((i<stone.x && i<3)||(i>stone.x && i>size-2)||(j<stone.y && j<3)||(j>stone.y && j>size-2))
+    	    							estimateBoard[i][j]-=m/(pow(f,distanceMap[i][j]-2));
+    	    						else
+    	    							estimateBoard[i][j]-=m/(pow(f,distanceMap[i][j]));
     	    					}
     	    			}
     			}
     		}
+    		/*for(int i=1; i<=size ;i++){
+    			for(int j=1; j<=size ;j++){
+    				System.out.print(estimateBoard[i][j]+" ");
+    			}
+    			System.out.println("");
+    		}*/
     	}
     	else if(isEstimate){
     		isEstimate=false;
     	}
     	
+    }
+    
+    public void newGame(){
+    	int dialogButton = 0; 
+	    dialogButton = JOptionPane.showConfirmDialog (null, "Do you want to play a new game?","Confirm", dialogButton);
+	    if(dialogButton == JOptionPane.YES_OPTION){
+	    	information=";";
+			try{
+				FileWriter fw = new FileWriter("record.txt");
+				fw.write(information + "\r\n");
+				fw.flush();
+				fw.close();
+				System.out.println(information);
+			} catch (IOException e) {
+			}
+			loading();
+	    }
     }
     
 }
