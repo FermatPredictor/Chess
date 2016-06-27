@@ -12,6 +12,8 @@ import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
 import controlP5.ControlP5;
+import ddf.minim.AudioPlayer;
+import ddf.minim.Minim;
 import processing.core.PApplet;
 import processing.core.PImage;
 
@@ -41,6 +43,9 @@ public class ChessBoard extends PApplet {
 	private boolean isBlackAIOn=false;
 	private boolean isAITurn=false;
 	private boolean isEnding=false;
+	private Minim minim;
+	private AudioPlayer song;
+	private AudioPlayer effect[]=new AudioPlayer[10];
 	
 	public ChessBoard() {
 		try {
@@ -94,6 +99,9 @@ public class ChessBoard extends PApplet {
 		cp5.addButton("estimate").setLabel("Estimate")
                                  .setPosition(1030,50)
                                  .setSize(100, 50);
+		
+		minim = new Minim(this);
+		effect[0]=minim.loadFile("Stone.wav");
 	}
 	
 	public void draw() 
@@ -418,6 +426,8 @@ public class ChessBoard extends PApplet {
 				information=information.concat(";W["+ch_x+ch_y+"]");
 			}
 				nowStep++;
+				effect[0].loop();
+				effect[0].play();
 				
 				try{
 					FileWriter fw = new FileWriter("record.txt");
@@ -514,6 +524,8 @@ public class ChessBoard extends PApplet {
 				information=information.concat(";W["+ch_x+ch_y+"]");
 			}
 				nowStep++;
+				effect[0].loop();
+				effect[0].play();
 				
 				try{
 					FileWriter fw = new FileWriter("record.txt");
