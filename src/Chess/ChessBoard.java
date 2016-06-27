@@ -31,6 +31,8 @@ public class ChessBoard extends PApplet {
 	private ArrayList<Stone> stones;
 	private char[][] points=new char[size+1][size+1]; //b:black; w:white; n:null
 	private char[][] judgeBoard=new char[size+1][size+1];
+	private int[][] estimateBoard=new int[size+1][size+1];
+	private int[][] distanceMap=new int[size+1][size+1];//use in estimate, count the distance between null point and a chess
 	private boolean judgeing;
 	private boolean canPlaceChess=true;
 	private boolean isForbiddenPoint=false;
@@ -43,6 +45,7 @@ public class ChessBoard extends PApplet {
 	private boolean isBlackAIOn=false;
 	private boolean isAITurn=false;
 	private boolean isEnding=false;
+	private boolean isEstimate=false;
 	private Minim minim;
 	private AudioPlayer song;
 	private AudioPlayer effect[]=new AudioPlayer[10];
@@ -117,7 +120,7 @@ public class ChessBoard extends PApplet {
 			isAITurn=false;
 		}
 		
-		if(mousePressed && canPlaceChess && !isForbiddenPoint && !isAITurn){
+		if(mousePressed && canPlaceChess && !isForbiddenPoint && !isAITurn  && !isEstimate){
 			placeChess();
 			canPlaceChess=false;
 			isClicked = true;
@@ -151,7 +154,7 @@ public class ChessBoard extends PApplet {
 		else if(nowStep%2==0)
 			isForbiddenPoint=judgeForbiddenPoint(x,y,'w');
 		
-		if(x>0 && y>0 && !isForbiddenPoint && points[x][y]=='n'){
+		if(x>0 && y>0 && !isForbiddenPoint && points[x][y]=='n' && !isEstimate){
 			if(nowStep%2==1){
 				fill(0);
 				ellipse(chessX+(getCoordinate()[0]-1)*unit, chessY+(getCoordinate()[1]-1)*unit,unit*(float)0.8,unit*(float)0.8);
@@ -177,6 +180,19 @@ public class ChessBoard extends PApplet {
 					else if(stone.color.equals("white"))
 						image(white,chessX+(stone.x-1)*unit-unit/2, chessY+(stone.y-1)*unit-unit/2);
 				}
+			}
+		}
+		
+		if(isEstimate){
+			for(int i=1; i<=size ;i++)
+    			for(int j=1; j<=size ;j++)
+			if(estimateBoard[i][j]>=20){
+				fill(0);
+				ellipse(chessX+(i-1)*unit, chessY+(j-1)*unit,unit*(float)0.6,unit*(float)0.6);
+			}
+			else if(estimateBoard[i][j]<=-20){
+				fill(255);
+				ellipse(chessX+(i-1)*unit, chessY+(j-1)*unit,unit*(float)0.6,unit*(float)0.6);
 			}
 		}
 		
@@ -582,7 +598,90 @@ public class ChessBoard extends PApplet {
     	}
     }
     
+    private void reNew()
+	{
+	    for(int i=0; i<=size; i++)
+	        for(int j=0; j<=size; j++)
+	        	distanceMap[i][j]=-2;
+
+	}
+	
+	private void setEffectArea(int x,int y)
+	{
+		distanceMap[x][y]=-1;
+		if(x+1<=size)
+			if(points[x+1][y]=='n'&& distanceMap[x+1][y]==-2)
+				setEffectArea(x+1,y);
+		if(x-1>0)
+			if(points[x-1][y]=='n'&& distanceMap[x-1][y]==-2)
+				setEffectArea(x-1,y);
+		if(y+1<=size)
+			if(points[x][y+1]=='n'&& distanceMap[x][y+1]==-2)
+				setEffectArea(x,y+1);
+		if(y-1>0)
+			if(points[x][y-1]=='n'&& distanceMap[x][y-1]==-2)
+				setEffectArea(x,y-1);
+	}
+
+	private void countDistance(int d)
+	{
+	    int i,j,f=0;
+
+	    for(i=1; i<=size; i++)
+	        for(j=1; j<=size; j++)
+	            if(distanceMap[i][j]==d)
+	            {   
+	            	if(i+1<=size)
+	            		if(distanceMap[i+1][j]==-1)
+	            			distanceMap[i+1][j]=d+1;
+	            	if(i-1>0)
+	            		if(distanceMap[i-1][j]==-1)
+	            			distanceMap[i-1][j]=d+1;
+	            	if(j+1<=size)
+	            		if(distanceMap[i][j+1]==-1)
+	            			distanceMap[i][j+1]=d+1;
+	            	if(j-1>0)
+	            		if(distanceMap[i][j-1]==-1)
+	            			distanceMap[i][j-1]=d+1;
+	                f=1;
+
+	            }
+	    if(f==1 && d<6)
+	    	countDistance(d+1);
+
+	}
+	
     public void estimate(){
+    	//parameter
+    	int m=64, f=2;
+
+    	if(!isEstimate){
+    		isEstimate=true;
+    		for(int i=1; i<=size ;i++)
+    			for(int j=1; j<=size ;j++)
+    				estimateBoard[i][j]=0;
+    		for(Stone stone: stones){
+    			if(!stone.isDead){
+    				reNew();
+    				setEffectArea(stone.x,stone.y);
+    				distanceMap[stone.x][stone.y]=0;
+    				countDistance(0);
+    				for(int i=1; i<=size ;i++)
+    	    			for(int j=1; j<=size ;j++)
+    	    				if(distanceMap[i][j]>=0){
+    	    					if(stone.color.equals("black")){
+    	    						estimateBoard[i][j]+=m/(pow(f,distanceMap[i][j]));
+    	    					}
+    	    					else if(stone.color.equals("white")){
+    	    						estimateBoard[i][j]-=m/(pow(f,distanceMap[i][j]));
+    	    					}
+    	    			}
+    			}
+    		}
+    	}
+    	else if(isEstimate){
+    		isEstimate=false;
+    	}
     	
     }
     
