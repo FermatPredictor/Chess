@@ -29,11 +29,10 @@ public class ChessBoard extends PApplet {
 	private float unit=(float)chessBoardWidth/(size-1);
 	private int nowStep=1;
 	private ArrayList<Stone> stones;
-	private char[][] points=new char[size+1][size+1]; //b:black; w:white; n:null
+	public char[][] points=new char[size+1][size+1]; //b:black; w:white; n:null
 	private char[][] judgeBoard=new char[size+1][size+1];
 	private int[][] estimateBoard=new int[size+1][size+1];
 	private int[][] distanceMap=new int[size+1][size+1];//use in estimate, count the distance between null point and a chess
-	private int[][] AIBoard=new int[size+1][size+1];
 	private boolean judgeing;
 	private boolean canPlaceChess=true;
 	private boolean isForbiddenPoint=false;
@@ -50,6 +49,7 @@ public class ChessBoard extends PApplet {
 	private Minim minim;
 	private AudioPlayer song;
 	private AudioPlayer effect[]=new AudioPlayer[10];
+	private AI ai;
 	
 	public ChessBoard() {
 		try {
@@ -87,6 +87,7 @@ public class ChessBoard extends PApplet {
         whiteCat2.resize(200, 150);
         blackCat2.resize(200, 150);
 		stones=new ArrayList<Stone>();
+		ai=new AI(size,this,this);
 		
 		loading();
 		
@@ -428,7 +429,7 @@ public class ChessBoard extends PApplet {
 
 		int x=getCoordinate()[0];
 		int y=getCoordinate()[1];
-		if(x>0 && y>0 && points[x][y]=='n'){
+		if(x>0 && y>0 && x<=size && y<=size && points[x][y]=='n'){
 			if(nowStep%2==1){
 				judgeChessDead(x,y,'b');
 				points[x][y]='b';
@@ -508,39 +509,14 @@ public class ChessBoard extends PApplet {
     	//System.out.println(nowStep);
     }
     
-    //this will decide a coordinate that AI want to play.
-    private int[] AIaction(char color){
-    	int point[]=new int[2];
-    	int branch=1;
-    	for(int i=1; i<=size ;i++)
-			for(int j=1; j<=size ;j++)
-				AIBoard[i][j]=0;
-    	
-    	for(int i=1; i<=size ;i++)
-			for(int j=1; j<=size ;j++)
-				if(points[i][j]=='n' && !judgeForbiddenPoint(i,j,color)){
-					AIBoard[i][j]=branch;
-					branch++;
-				}
-    	Random random=new Random();
-    	int choose=random.nextInt(branch-1)+1;
-    	
-    	for(int i=1; i<=size ;i++)
-			for(int j=1; j<=size ;j++)
-				if(AIBoard[i][j]==choose){
-					point[0]=i;
-					point[1]=j;
-				}
-    	
-    	return point;
-    }
+   
     
     private void placeChessForAI(char color){
     	int point[]=new int[2];
-    	point=AIaction(color);
+    	point=ai.AIaction(color);
 		int x=point[0];
 		int y=point[1];
-		if(x>0 && y>0 && points[x][y]=='n'){
+		if(x>0 && y>0 && x<=size && y<=size && points[x][y]=='n'){
 			if(nowStep%2==1){
 				judgeChessDead(x,y,'b');
 				points[x][y]='b';
@@ -569,6 +545,12 @@ public class ChessBoard extends PApplet {
 					//System.out.println(information);
 				} catch (IOException e) {
 				}
+		}
+		else{
+			if(color=='b')
+				isBlackAIOn=false;
+			else if(color=='w')
+				isWhiteAIOn=false;
 		}
 		
    }
