@@ -37,6 +37,8 @@ public class ChessBoard extends PApplet {
 	private boolean canPlaceChess=true;
 	private boolean isForbiddenPoint=false;
 	public boolean isClicked = false;
+	private int blackCaps=0;
+	private int whiteCaps=0;
 	private int caps=0;
 	private int capsPoint[]=new int[2];//the coordinate of captured chess, only use in judge ko. 
 	private int judgeCaps=0;
@@ -50,6 +52,7 @@ public class ChessBoard extends PApplet {
 	private AudioPlayer song;
 	private AudioPlayer effect[]=new AudioPlayer[10];
 	private AI ai;
+	public int lastMove[]=new int[2];
 	
 	public ChessBoard() {
 		try {
@@ -151,6 +154,13 @@ public class ChessBoard extends PApplet {
 			image(blackCat1,700,200);
 			image(whiteCat2,900,200);
 		}
+		fill(192,107,86);
+		rect(700,350,400,50);
+		fill(0);
+		this.textFont(createFont("Arial", 12), 24);
+        this.text("caps" , 880, 380);
+        this.text(blackCaps , 800, 380);
+        this.text(whiteCaps , 1000, 380);
 		
 		int x=getCoordinate()[0];
 		int y=getCoordinate()[1];
@@ -174,15 +184,17 @@ public class ChessBoard extends PApplet {
 		if(!stones.isEmpty()){
 			for(Stone stone: stones){
 				if(stone.step==nowStep-1){
-					if(stone.color.equals("black"))
+					lastMove[0]=stone.x;
+					lastMove[1]=stone.y;
+					if(stone.color=='b')
 						image(blackCurrent,chessX+(stone.x-1)*unit-unit/2, chessY+(stone.y-1)*unit-unit/2);
-					else if(stone.color.equals("white"))
+					else if(stone.color=='w')
 						image(whiteCurrent,chessX+(stone.x-1)*unit-unit/2, chessY+(stone.y-1)*unit-unit/2);
 				}
 				else if(!stone.isDead){
-					if(stone.color.equals("black"))
+					if(stone.color=='b')
 						image(black,chessX+(stone.x-1)*unit-unit/2, chessY+(stone.y-1)*unit-unit/2);
-					else if(stone.color.equals("white"))
+					else if(stone.color=='w')
 						image(white,chessX+(stone.x-1)*unit-unit/2, chessY+(stone.y-1)*unit-unit/2);
 				}
 			}
@@ -258,6 +270,8 @@ public class ChessBoard extends PApplet {
 				 capsPoint[1]=stone.y;
 			 }
 		 }
+		 if(c=='w')blackCaps++;
+		 else if(c=='b')whiteCaps++;
 		 points[now_x][now_y]='n';
 		 if(now_x+1<=boardSize){
 			 if(points[now_x+1][now_y]==c)cleaning(boardSize,now_x+1,now_y,c);
@@ -433,7 +447,7 @@ public class ChessBoard extends PApplet {
 			if(nowStep%2==1){
 				judgeChessDead(x,y,'b');
 				points[x][y]='b';
-				stones.add(new Stone(x,y,nowStep,"black",this,this));
+				stones.add(new Stone(x,y,nowStep,'b',this,this));
 				char ch_x=(char)((int)'a'+x-1);
 				char ch_y=(char)((int)'a'+y-1);
 				information=information.concat(";B["+ch_x+ch_y+"]");
@@ -441,7 +455,7 @@ public class ChessBoard extends PApplet {
 			else if(nowStep%2==0){
 				judgeChessDead(x,y,'w');
 				points[x][y]='w';
-				stones.add(new Stone(x,y,nowStep,"white",this,this));
+				stones.add(new Stone(x,y,nowStep,'w',this,this));
 				char ch_x=(char)((int)'a'+x-1);
 				char ch_y=(char)((int)'a'+y-1);
 				information=information.concat(";W["+ch_x+ch_y+"]");
@@ -470,12 +484,12 @@ public class ChessBoard extends PApplet {
 			if(color=='b'){
 				judgeChessDead(x,y,'b');
 				points[x][y]='b';
-				stones.add(new Stone(x,y,nowStep,"black",this,this));
+				stones.add(new Stone(x,y,nowStep,'b',this,this));
 			}
 			else if(color=='w'){
 				judgeChessDead(x,y,'w');
 				points[x][y]='w';
-				stones.add(new Stone(x,y,nowStep,"white",this,this));
+				stones.add(new Stone(x,y,nowStep,'w',this,this));
 			}
 		}
 		//if one pass, still add a step 
@@ -487,6 +501,8 @@ public class ChessBoard extends PApplet {
     	
     	stones.clear();
     	nowStep=1;
+        blackCaps=0;
+        whiteCaps=0;
 		for(int i=1; i<=size ;i++)
 			for(int j=1; j<=size ;j++)
 				points[i][j]='n';
@@ -520,7 +536,7 @@ public class ChessBoard extends PApplet {
 			if(nowStep%2==1){
 				judgeChessDead(x,y,'b');
 				points[x][y]='b';
-				stones.add(new Stone(x,y,nowStep,"black",this,this));
+				stones.add(new Stone(x,y,nowStep,'b',this,this));
 				char ch_x=(char)((int)'a'+x-1);
 				char ch_y=(char)((int)'a'+y-1);
 				information=information.concat(";B["+ch_x+ch_y+"]");
@@ -528,7 +544,7 @@ public class ChessBoard extends PApplet {
 			else if(nowStep%2==0){
 				judgeChessDead(x,y,'w');
 				points[x][y]='w';
-				stones.add(new Stone(x,y,nowStep,"white",this,this));
+				stones.add(new Stone(x,y,nowStep,'w',this,this));
 				char ch_x=(char)((int)'a'+x-1);
 				char ch_y=(char)((int)'a'+y-1);
 				information=information.concat(";W["+ch_x+ch_y+"]");
@@ -669,13 +685,13 @@ public class ChessBoard extends PApplet {
     				for(int i=1; i<=size ;i++)
     	    			for(int j=1; j<=size ;j++)
     	    				if(distanceMap[i][j]>=0){
-    	    					if(stone.color.equals("black")){
+    	    					if(stone.color=='b'){
     	    						if((i<stone.x && i<3)||(i>stone.x && i>size-2)||(j<stone.y && j<3)||(j>stone.y && j>size-2))
     	    							estimateBoard[i][j]+=m/(pow(f,distanceMap[i][j]-2));
     	    						else
     	    							estimateBoard[i][j]+=m/(pow(f,distanceMap[i][j]));
     	    					}
-    	    					else if(stone.color.equals("white")){
+    	    					else if(stone.color=='w'){
     	    						if((i<stone.x && i<3)||(i>stone.x && i>size-2)||(j<stone.y && j<3)||(j>stone.y && j>size-2))
     	    							estimateBoard[i][j]-=m/(pow(f,distanceMap[i][j]-2));
     	    						else
@@ -694,6 +710,7 @@ public class ChessBoard extends PApplet {
     	else if(isEstimate){
     		isEstimate=false;
     	}
+    	
     	
     }
     
