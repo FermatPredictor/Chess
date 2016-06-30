@@ -10,7 +10,7 @@ public class AI {
 	protected PApplet parent;
 	protected ChessBoard board;
 	int size;
-	private int simulateNum=100;
+	private int simulateNum=20;
 	private boolean judgeing;
 	private int caps=0;
 	private int capsPoint[]=new int[2];//the coordinate of captured stones, only use in judge ko. 
@@ -30,7 +30,7 @@ public class AI {
 	private char[][] judgeBoard; // j:has judged
 	private char[][] setChainBoard; //use in set chain, avoid put the stones in chain repeatly.
 	private char[][] judgeClosedBoard; //judge whether a chain is closed.
-	private int[][] PriortyBoard;//decide a considerable point(0~1) 
+	private float[][] priortyBoard;//decide a considerable point(0~1) 
 	private ArrayList<Chain> chains;
 	
 	public AI(int size, PApplet parent, ChessBoard board){
@@ -44,7 +44,7 @@ public class AI {
 		setChainBoard=new char[size+1][size+1];
 		judgeClosedBoard=new char[size+1][size+1];
 		ControlledAreaBoard=new char[size+1][size+1];
-		PriortyBoard=new int[size+1][size+1];
+		priortyBoard=new float[size+1][size+1];
 		chains=new ArrayList<Chain>();
 	}
 	
@@ -481,14 +481,14 @@ public class AI {
 		 lastMove=board.lastMove;
 		 for(int i=1; i<=size ;i++)
 				for(int j=1; j<=size ;j++)
-					PriortyBoard[i][j]=0;
+					priortyBoard[i][j]=1;
 		 
 		 for(int i=1; i<=size ;i++)
 				for(int j=1; j<=size ;j++){
 					if(simulateBoard[i][j]=='n' && !judgeForbiddenPoint(i,j,color)){
 						
 						if(lastMove[0]>0 && Math.abs(lastMove[0]-i)+Math.abs(lastMove[1]-j)<=2)
-							PriortyBoard[i][j]=1;
+							priortyBoard[i][j]=(float)1.2;
 						
 						if(i>2 && i<size-1 && j>2 &&j<size-1){
 							if(simulateBoard[i-1][j]=='n' && simulateBoard[i+1][j]=='n' && simulateBoard[i][j-1]=='n' && simulateBoard[i][j+1]=='n')
@@ -496,13 +496,18 @@ public class AI {
 								||simulateBoard[i-1][j-1]==color||simulateBoard[i-1][j+1]==color||simulateBoard[i+1][j-1]==color||simulateBoard[i+1][j-1]==color
 								||simulateBoard[i-2][j-1]==color||simulateBoard[i-2][j+1]==color||simulateBoard[i+2][j-1]==color||simulateBoard[i+2][j-1]==color
 								||simulateBoard[i-1][j-2]==color||simulateBoard[i-1][j+2]==color||simulateBoard[i+1][j-2]==color||simulateBoard[i+1][j-2]==color)
-								PriortyBoard[i][j]=1;
+								priortyBoard[i][j]=(float)1.2;
+						}
+						
+						if(i>1 && i<size && j>1 &&j<size){
+							if(simulateBoard[i-1][j]==color || simulateBoard[i+1][j]==color || simulateBoard[i][j-1]==color || simulateBoard[i][j+1]==color)
+								priortyBoard[i][j]=(float)1.2;
 						}
 						
 						//occupy the empty corner.
 						if((i==3||i==4||i==size-2||i==size-3) && (j==3||j==4||j==size-2||j==size-3))
 							if(simulateBoard[i-1][j]=='n' && simulateBoard[i+1][j]=='n' && simulateBoard[i][j-1]=='n' && simulateBoard[i][j+1]=='n')
-							PriortyBoard[i][j]=1;
+							priortyBoard[i][j]=(float)1.2;
 					}
 				}
 	 }
@@ -529,7 +534,7 @@ public class AI {
 				copyBoard();
 				setChains();
 				setPriortyBoard(color);
-				if(board.points[i][j]=='n' && !board.judgeForbiddenPoint(i,j,color) && ControlledAreaBoard[i][j]=='n' && PriortyBoard[i][j]==1){
+				if(board.points[i][j]=='n' && !board.judgeForbiddenPoint(i,j,color) && ControlledAreaBoard[i][j]=='n'){
 					for(int k=1; k<=simulateNum ;k++){
 						isEnding=false;
 						copyBoard();
@@ -560,7 +565,11 @@ public class AI {
 						}
 					}
 				}
-			}
+			}	
+    	
+   /*for(int i=1; i<=size ;i++)
+			for(int j=1; j<=size ;j++)
+				valueBoard[i][j]*=priortyBoard[i][j*/
     	
     	point[0]=1;
 		point[1]=1;
